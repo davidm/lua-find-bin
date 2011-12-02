@@ -43,18 +43,28 @@ DESIGN NOTES
   This module may fail if the current working directory is changed after
   arg[0] is set and before findbin.lua is loaded.
 
-HOME PAGE / DOWNLOAD
+HOME PAGE
 
   https://gist.github.com/1342365
   
-INSTALLATION
+DOWNLOAD/INSTALL
 
-  Copy findbin.lua into your LUA_PATH.  You may optionally run
-  "lua findbin.lua unpack" to unpack the module into individual files in
-  an "out" subdirectory.   file_slurp ( https://gist.github.com/1325400/ )
-  is required to do this.  To subsequently install into LuaRocks, run
-  "cd out && luarocks make findbin*.rockspec"
-  
+  If using LuaRocks:
+    luarocks install lua-findbin
+
+  Otherwise, download <https://raw.github.com/gist/1342365/findbin.lua>.
+  Alternately, if using git:
+    git clone git://gist.github.com/1342365.git lua-findbin
+    cd lua-globtopattern
+  Optionally unpack and install in LuaRocks:
+    Download <https://raw.github.com/gist/1422205/sourceunpack.lua>.
+    lua sourceunpack.lua findbin.lua
+    cd out && luarocks make *.rockspec
+
+DEPENDENCIES
+
+  None (other than Lua 5.1 or 5.2).
+    
 RELATED WORK
 
   http://search.cpan.org/perldoc?FindBin
@@ -87,7 +97,7 @@ THE SOFTWARE.
 -- findbin.lua
 -- (c) 2011 David Manura.  Licensed under the same terms as Lua 5.1 (MIT license).
 
-local M = {_TYPE='module', _NAME='findbin', _VERSION='000.001.001'}
+local M = {_TYPE='module', _NAME='findbin', _VERSION='0.1.20111130'}
 
 local script = arg and arg[0] or ''
 
@@ -98,32 +108,29 @@ M.bin = bin
 
 setmetatable(M, {__call = function(_, relpath) return bin .. relpath end})
 
--- This ugly line will delete itself upon unpacking the module.
-if...=='unpack'then assert(loadstring(io.open(arg[0]):read'*a':gsub('[^\n]*return M[^\n]*','')))()end
-
 return M
 
---[[ FILE findbin-$(_VERSION)-1.rockspec
+--[[ FILE lua-findbin-$(_VERSION)-1.rockspec
 
-package = 'findbin'
+package = 'lua-findbin'
 version = '$(_VERSION)-1'
 source = {
-  -- IMPROVE?
-  --url = 'https://raw.github.com/gist/1342365/findbin.lua',
-  url = 'https://gist.github.com/gists/1342365/download',
-  file = 'findbin-$(_VERSION).tar.gz'
-  --url = 'https://raw.github.com/gist/1342365/FIX/dir.lua',
-  --md5 = 'FIX'
+  url = 'https://raw.github.com/gist/1342365/$(GITID)/findbin.lua',
+  --url = 'https://raw.github.com/gist/1342365/findbin.lua', -- latest raw
+  --url = 'https://gist.github.com/gists/1342365/download', -- latest archive
+  md5 = '$(MD5)'
 }
 description = {
   summary = ' Locate directory of original Lua script',
   detailed =
     ' Locate directory of original Lua script.',
   license = 'MIT/X11',
-  homepage = 'https://gist.github.com/TODO',
+  homepage = 'https://gist.github.com/1342365',
   maintainer = 'David Manura'
 }
-dependencies = {}
+dependencies = {
+  'lua >= 5.1' -- including 5.2
+}
 build = {
   type = 'builtin',
   modules = {
@@ -157,29 +164,3 @@ print 'OK'
 
 --]]---------------------------------------------------------------------
 
---[[ FILE unpack.lua  -- return M
-
--- This optional code unpacks files into an "out" subdirectory for deployment.
-local M = M
-local FS = require 'file_slurp'
-local name = arg[0]:match('[^/\\]+')
-local code = FS.readfile(name, 'T')
-code = code:gsub('%-*\n*%-%-%[%[%s*FILE%s+(%S+).-\n\n?(.-)%-%-%]%]%-*%s*',
- function(filename, text)
-  filename = filename:gsub('%$%(_VERSION%)', M._VERSION)
-  text = text:gsub('%$%(_VERSION%)', M._VERSION)
-  if filename ~= 'unpack.lua' then
-    if not FS.writefile('out/.test', '', 's') then os.execute'mkdir out' end
-    os.remove'out/.test'
-    print('writing out/' .. filename)
-    FS.writefile('out/' .. filename, text)
-  end
-  return ''
-end)
-code = code:gsub('%-%- ?This ugly line[^\n]*\n[^\n]*\n', '')
-print('writing out/' .. name)
-FS.writefile('out/' .. name, code)
-print('testing...')
-assert(loadfile('out/test.lua'))()
-
---]]---------------------------------------------------------------------
