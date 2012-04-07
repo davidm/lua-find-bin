@@ -1,5 +1,3 @@
---[[ FILE README.txt
-
 LUA MODULE
 
   findbin v$(_VERSION) -  Locate directory of original Lua script
@@ -45,21 +43,23 @@ DESIGN NOTES
 
 HOME PAGE
 
-  https://gist.github.com/1342365
+  https://github.com/davidm/lua-find-bin
   
 DOWNLOAD/INSTALL
 
-  If using LuaRocks:
-    luarocks install lua-findbin
+  To install using LuaRocks:
+  
+    luarocks install findbin
 
-  Otherwise, download <https://raw.github.com/gist/1342365/findbin.lua>.
-  Alternately, if using git:
-    git clone git://gist.github.com/1342365.git lua-findbin
-    cd lua-globtopattern
-  Optionally unpack and install in LuaRocks:
-    Download <https://raw.github.com/gist/1422205/sourceunpack.lua>.
-    lua sourceunpack.lua findbin.lua
-    cd out && luarocks make *.rockspec
+  Otherwise, download from https://github.com/davidm/lua-find-bin .
+
+  You may just copy findbin.lua into your LUA_PATH.
+
+  Optionally:
+    
+    make test
+    make install  (or make install-local)  -- to install in LuaRocks
+    make remove (or make remove-local) -- to remove from LuaRocks
 
 DEPENDENCIES
 
@@ -68,11 +68,11 @@ DEPENDENCIES
 RELATED WORK
 
   http://search.cpan.org/perldoc?FindBin
-  https://gist.github.com/1342319 (Lua 'lib' module)
+  https://github.com/davidm/lua-lib (Lua 'lib' module)
 
 COPYRIGHT
 
-(c) 2011 David Manura.  Licensed under the same terms as Lua 5.1 (MIT license).
+(c) 2011-2012 David Manura.  Licensed under the same terms as Lua 5.1 (MIT license).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -92,75 +92,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
   
---]]---------------------------------------------------------------------
-
--- findbin.lua
--- (c) 2011 David Manura.  Licensed under the same terms as Lua 5.1 (MIT license).
-
-local M = {_TYPE='module', _NAME='findbin', _VERSION='0.1.20111130'}
-
-local script = arg and arg[0] or ''
-
-local bin = script:gsub('[/\\]?[^/\\]+$', '') -- remove file name
-if bin == '' then bin = '.' end
-
-M.bin = bin
-
-setmetatable(M, {__call = function(_, relpath) return bin .. relpath end})
-
-return M
-
---[[ FILE lua-findbin-$(_VERSION)-1.rockspec
-
-package = 'lua-findbin'
-version = '$(_VERSION)-1'
-source = {
-  url = 'https://raw.github.com/gist/1342365/$(GITID)/findbin.lua',
-  --url = 'https://raw.github.com/gist/1342365/findbin.lua', -- latest raw
-  --url = 'https://gist.github.com/gists/1342365/download', -- latest archive
-  md5 = '$(MD5)'
-}
-description = {
-  summary = ' Locate directory of original Lua script',
-  detailed =
-    ' Locate directory of original Lua script.',
-  license = 'MIT/X11',
-  homepage = 'https://gist.github.com/1342365',
-  maintainer = 'David Manura'
-}
-dependencies = {
-  'lua >= 5.1' -- including 5.2
-}
-build = {
-  type = 'builtin',
-  modules = {
-    ['findbin'] = 'findbin.lua'
-  }
-}
-
---]]---------------------------------------------------------------------
-
-
---[[ FILE test.lua
-
-
-local function checkeq(a, b, e)
-  if a ~= b then error(
-    'not equal ['..tostring(a)..'] ['..tostring(b)..'] ['..tostring(e)..']', 2)
-  end
-end
-
-checkeq(type(require 'findbin'.bin), 'string')
-
-arg = nil; package.loaded.findbin = nil
-checkeq(require 'findbin'.bin, '.')
-arg = {[0] = 'foo.lua'}; package.loaded.findbin = nil
-checkeq(require 'findbin'.bin, '.')
-arg = {[0] = 'bar/foo.lua'}; package.loaded.findbin = nil
-checkeq(require 'findbin'.bin, 'bar')
-checkeq(require 'findbin' '/qux.lua', 'bar/qux.lua')
-
-print 'OK'
-
---]]---------------------------------------------------------------------
-

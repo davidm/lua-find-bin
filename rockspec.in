@@ -1,0 +1,27 @@
+package = 'find-bin'
+version = '$(_VERSION)-1'
+source = {
+  url = 'git://github.com/davidm/lua-find-bin.git',
+}
+description = {
+  summary = ' Locates directory of original Lua script',
+  detailed =
+    ' Locates directory of original Lua script.',
+  license = 'MIT/X11',
+  homepage = 'https://github.com/davidm/lua-find-bin',
+  maintainer = 'David Manura'
+}
+dependencies = {
+  'lua >= 5.1' -- including 5.2
+}
+build = {
+  type = 'builtin',
+  modules = {
+    ['findbin'] = 'lua/findbin.lua'
+  }
+}
+
+-- for building the rockspec:
+-- VERSIONFROM="lua/findbin.lua"
+-- ROCKVERSION="1"
+-- ROCKSCMVERSION="1"
