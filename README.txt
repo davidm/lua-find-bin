@@ -1,6 +1,6 @@
 LUA MODULE
 
-  findbin v$(_VERSION) -  Locate directory of original Lua script
+  findbin v$(_VERSION) -  Locates directory of original Lua script
   
 SYNOPSIS
 
@@ -49,7 +49,7 @@ DOWNLOAD/INSTALL
 
   To install using LuaRocks:
   
-    luarocks install findbin
+    luarocks install find-bin
 
   Otherwise, download from https://github.com/davidm/lua-find-bin .
 

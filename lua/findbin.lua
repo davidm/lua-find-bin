@@ -1,4 +1,4 @@
--- findbin.lua
+-- findbin.lua -- see README
 -- (c) 2011-2012 David Manura.  Licensed under Lua 5.1 terms (MIT license).
 
 local M = {_TYPE='module', _NAME='findbin', _VERSION='0.1.1.20120406'}
